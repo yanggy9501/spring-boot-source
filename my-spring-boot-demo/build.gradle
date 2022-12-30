@@ -3,7 +3,7 @@ plugins {
     id "org.springframework.boot.conventions"
 }
 
-description = "Spring Boot Zhouyu"
+description = "Spring Boot Demo"
 
 group 'org.springframework.boot'
 version '2.6.6'
