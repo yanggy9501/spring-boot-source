@@ -239,14 +239,14 @@ public class SpringApplication {
 		// 1. 推测web应用类型（NONE、REACTIVE、SERVLET）
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
 
-		// 2. 从spring.factories中获取BootstrapRegistryInitializer对象
+		// 2. 从spring.factories中获取BootstrapRegistryInitializer类型的对象(BootstrapRegistryInitializer 是文件的key)
 		this.bootstrapRegistryInitializers = new ArrayList<>(
 				getSpringFactoriesInstances(BootstrapRegistryInitializer.class));
 
-		// 3. 从spring.factories中获取ApplicationContextInitializer对象
+		// 3. 从spring.factories中获取ApplicationContextInitializer类型的对象
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
 
-		// 4. 从spring.factories中获取ApplicationListener对象
+		// 4. 从spring.factories中获取ApplicationListener类型的对象
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
 
 		// 5. 推测出Main类（main()方法所在的类）
@@ -1389,7 +1389,7 @@ public class SpringApplication {
 	 * @return the running {@link ApplicationContext}
 	 */
 	public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
-		// 构造SpringApplication对象
+		// 构造 SpringApplication 对象（构造方法还有一些重要的操作，spi，推动main 方法，应用类型推断等等）
 		return new SpringApplication(primarySources).run(args);
 	}
 

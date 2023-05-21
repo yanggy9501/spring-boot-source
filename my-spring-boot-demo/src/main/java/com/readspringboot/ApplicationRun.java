@@ -8,6 +8,10 @@ public class ApplicationRun {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ApplicationRun.class, args);
+
+//		SpringApplication springApplication = new SpringApplication(ApplicationRun.class);
+//		springApplication.xxx
+//		springApplication.run(args);
 	}
 
 }
