@@ -100,7 +100,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 			return NO_IMPORTS;
 		}
 
-		// 获取自动配置类（spring.factories中所导入的）
+		// 获取自动配置类对象（spring.factories中所导入的），对象包含需要配置的全限定类名列表和需要排除的列表
 		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(annotationMetadata);
 		return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
 	}
@@ -120,6 +120,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @param annotationMetadata the annotation metadata of the configuration class
 	 * @return the auto-configurations that should be imported
 	 */
+	// 基于annotationMetadata发现标有{@link Configuration @Configuration}的配置类并返回{@link AutoConfigurationEntry}
 	protected AutoConfigurationEntry getAutoConfigurationEntry(AnnotationMetadata annotationMetadata) {
 		if (!isEnabled(annotationMetadata)) {
 			return EMPTY_ENTRY;
@@ -144,6 +145,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		// spring-autoconfigure-metadata.properties文件中的内容是利用Java中的AbstractProcessor技术在编译时生成出来的
 		configurations = getConfigurationClassFilter().filter(configurations);
 		// configurations表示合格的，exclusions表示被排除的，把它们记录在ConditionEvaluationReportAutoConfigurationImportListener中
+		// // 触发导入自动配置事件
 		fireAutoConfigurationImportEvents(configurations, exclusions);
 
 		// 最后返回的AutoConfiguration都是符合条件的
@@ -195,8 +197,10 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @return a list of candidate configurations
 	 */
 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+		// 获取需要被加载的FactoryClass，也就是key（spring.factories 中key）
 		List<String> configurations = SpringFactoriesLoader.loadFactoryNames(getSpringFactoriesLoaderFactoryClass(),
 				getBeanClassLoader());
+		// 获取需要配置的全限定类名集合（value）
 		Assert.notEmpty(configurations, "No auto configuration classes found in META-INF/spring.factories. If you "
 				+ "are using a custom packaging, make sure that file is correct.");
 		return configurations;
