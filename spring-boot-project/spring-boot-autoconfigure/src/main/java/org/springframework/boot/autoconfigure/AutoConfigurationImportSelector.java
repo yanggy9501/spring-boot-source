@@ -95,6 +95,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	public String[] selectImports(AnnotationMetadata annotationMetadata) {
 		// 会在所有@Configuration都解析完了之后才执行
 
+		// 配置参数 spring.boot.enableautoconfiguration 是否打开，默认 true 开启
 		if (!isEnabled(annotationMetadata)) {
 			return NO_IMPORTS;
 		}

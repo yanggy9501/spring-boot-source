@@ -108,6 +108,10 @@ public abstract class AutoConfigurationPackages {
 
 		@Override
 		public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+			// 注册当前主程序的同级以及子集的包组件，其实就是注册了一个Bean的定义
+			// 1.获取注解的所在的类，一般是启动类
+			// 2.获取同级的package以及子package
+			// 3.扫描这些package，并将组件导入到spring管理的容器中，之后可以被用作spring.factories配置文件的key
 			register(registry, new PackageImports(metadata).getPackageNames().toArray(new String[0]));
 		}
 
@@ -132,7 +136,7 @@ public abstract class AutoConfigurationPackages {
 			for (Class<?> basePackageClass : attributes.getClassArray("basePackageClasses")) {
 				packageNames.add(basePackageClass.getPackage().getName());
 			}
-			// MyApplicatoin类所在的包
+			// MyApplication类所在的包
 			if (packageNames.isEmpty()) {
 				packageNames.add(ClassUtils.getPackageName(metadata.getClassName()));
 			}
