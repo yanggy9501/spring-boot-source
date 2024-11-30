@@ -70,6 +70,7 @@ import org.springframework.util.StringUtils;
  * @since 1.3.0
  * @see EnableAutoConfiguration
  */
+// spring spi 从 spring.factories 文件中加载 bean
 public class AutoConfigurationImportSelector implements DeferredImportSelector, BeanClassLoaderAware,
 		ResourceLoaderAware, BeanFactoryAware, EnvironmentAware, Ordered {
 
@@ -93,8 +94,6 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	@Override
 	public String[] selectImports(AnnotationMetadata annotationMetadata) {
-		// 会在所有@Configuration都解析完了之后才执行
-
 		// 配置参数 spring.boot.enableautoconfiguration 是否打开，默认 true 开启
 		if (!isEnabled(annotationMetadata)) {
 			return NO_IMPORTS;
@@ -120,7 +119,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @param annotationMetadata the annotation metadata of the configuration class
 	 * @return the auto-configurations that should be imported
 	 */
-	// 基于annotationMetadata发现标有{@link Configuration @Configuration}的配置类并返回{@link AutoConfigurationEntry}
+	// 基于annotationMetadata发现配置类并返回{@link AutoConfigurationEntry}
 	protected AutoConfigurationEntry getAutoConfigurationEntry(AnnotationMetadata annotationMetadata) {
 		if (!isEnabled(annotationMetadata)) {
 			return EMPTY_ENTRY;
@@ -145,7 +144,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		// spring-autoconfigure-metadata.properties文件中的内容是利用Java中的AbstractProcessor技术在编译时生成出来的
 		configurations = getConfigurationClassFilter().filter(configurations);
 		// configurations表示合格的，exclusions表示被排除的，把它们记录在ConditionEvaluationReportAutoConfigurationImportListener中
-		// // 触发导入自动配置事件
+		// 触发导入自动配置事件
 		fireAutoConfigurationImportEvents(configurations, exclusions);
 
 		// 最后返回的AutoConfiguration都是符合条件的
@@ -198,6 +197,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 */
 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
 		// 获取需要被加载的FactoryClass，也就是key（spring.factories 中key）
+		//【spring spi】
 		List<String> configurations = SpringFactoriesLoader.loadFactoryNames(getSpringFactoriesLoaderFactoryClass(),
 				getBeanClassLoader());
 		// 获取需要配置的全限定类名集合（value）

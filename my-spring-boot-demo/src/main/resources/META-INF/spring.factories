@@ -1,2 +1,6 @@
 org.springframework.context.ApplicationContextInitializer=\
 com.readspringboot.init.MyApplicationContextInitializer
+
+# 如果使用 org.springframework.boot.autoconfigure.EnableAutoConfiguration 做key，则该bean是不会自动注入的
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.readspringboot.bean.MyBean
