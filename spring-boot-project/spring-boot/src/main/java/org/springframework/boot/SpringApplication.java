@@ -233,20 +233,20 @@ public class SpringApplication {
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
-
+		// 把 SpringApplication 启动类作为 primarySources 属性存储起来
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
 
-		// 1. 推测web应用类型（NONE、REACTIVE、SERVLET）
+		// 1. 推测应用类型（NONE、REACTIVE、SERVLET）
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
 
-		// 2. 从spring.factories中获取BootstrapRegistryInitializer类型的对象(BootstrapRegistryInitializer 是文件的key)
+		// 2. 【获取启动加载器】spring spi 从spring.factories中获取 BootstrapRegistryInitializer 类型的对象(BootstrapRegistryInitializer 类全限定名称的key)
 		this.bootstrapRegistryInitializers = new ArrayList<>(
 				getSpringFactoriesInstances(BootstrapRegistryInitializer.class));
 
-		// 3. 从spring.factories中获取ApplicationContextInitializer类型的对象
+		// 3. 【设置容器初始化器】从spring.factories中获取 ApplicationContextInitializer 类型key的对象
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
 
-		// 4. 从spring.factories中获取ApplicationListener类型的对象
+		// 4. 【设置应用监听器】从spring.factories中获取 ApplicationListener 类型key的对象
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
 
 		// 5. 推测出Main类（main()方法所在的类）
@@ -269,6 +269,8 @@ public class SpringApplication {
 	}
 
 	/**
+	 * 运行spring应用程序，创建并刷新一个新的 {@link ApplicationContext} 容器.
+	 *
 	 * Run the Spring application, creating and refreshing a new
 	 * {@link ApplicationContext}.
 	 * @param args the application arguments (usually passed from a Java main method)
@@ -277,17 +279,17 @@ public class SpringApplication {
 	public ConfigurableApplicationContext run(String... args) {
 		long startTime = System.nanoTime();
 
-		// 1、创建引导启动器，类似一个ApplicationContext，可以往里面添加一些对象
+		// 1、【从启动器初始化器中】创建启动器，类似一个 ApplicationContext，可以往里面添加一些对象
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 
 		ConfigurableApplicationContext context = null;
 		configureHeadlessProperty();
 
-		// 2、从spring.factories中获取SpringApplicationRunListener对象
+		// 2、【spring spi】从spring.factories中获取 SpringApplicationRunListener对象(监听SpringBoot的启动流程)
 		// 默认会拿到一个EventPublishingRunListener，它会启动过程的各个阶段发布对应的ApplicationEvent事件
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 
-		// 3、发布ApplicationStartingEvent
+		// 3、【启动监听器】发布ApplicationStartingEvent
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
 
@@ -302,12 +304,14 @@ public class SpringApplication {
 			// 默认spring.beaninfo.ignore=true，表示不需要jdk缓存beanInfo信息，Spring自己会缓存
 			configureIgnoreBeanInfo(environment);
 
+			// 打印 banner
 			Banner printedBanner = printBanner(environment);
 
-			// 6、根据应用类型创建Spring容器
+			// 6、【创建spring容器】根据应用类型创建Spring容器
 			context = createApplicationContext();
 			context.setApplicationStartup(this.applicationStartup);
 
+			// 【spring容器前置处理】
 			// 7、利用ApplicationContextInitializer初始化Spring容器
 			// 8、发布ApplicationContextInitializedEvent
 			// 9、关闭DefaultBootstrapContext
@@ -315,7 +319,7 @@ public class SpringApplication {
 			// 11、发布ApplicationPreparedEvent事件
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
 
-			// 12、刷新Spring容器，会解析配置类、扫描、启动WebServer
+			// 12、【刷新Spring容器，会解析配置类、扫描、启动WebServer】
 			refreshContext(context);
 
 			// 空方法
@@ -327,10 +331,10 @@ public class SpringApplication {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), timeTakenToStartup);
 			}
 
-			// 13、发布ApplicationStartedEvent事件，表示Spring容器已经启动
+			// 13、【发出启动结束事件】发布ApplicationStartedEvent事件，表示Spring容器已经启动
 			listeners.started(context, timeTakenToStartup);
 
-			// 14、从Spring容器中获取ApplicationRunner和CommandLineRunner，并执行其run()
+			// 14、【执行runner的run方法】从Spring容器中获取 ApplicationRunner 和 CommandLineRunner，并执行其run()
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
@@ -354,7 +358,7 @@ public class SpringApplication {
 
 	private DefaultBootstrapContext createBootstrapContext() {
 		DefaultBootstrapContext bootstrapContext = new DefaultBootstrapContext();
-		// 利用bootstrapRegistryInitializers初始化DefaultBootstrapContext
+		// 利用 bootstrapRegistryInitializers 初始化 DefaultBootstrapContext @see SpringApplication 构造方法
 		this.bootstrapRegistryInitializers.forEach((initializer) -> initializer.initialize(bootstrapContext));
 		return bootstrapContext;
 	}
@@ -476,8 +480,11 @@ public class SpringApplication {
 
 	private void refreshContext(ConfigurableApplicationContext context) {
 		if (this.registerShutdownHook) {
+			// 添加：Runtime.getRuntime().addShutdownHook()
+			// 移除：Runtime.getRuntime().removeShutdownHook(this.shutdownHook)
 			shutdownHook.registerApplicationContext(context);
 		}
+		// ApplicationContext真正开始初始化容器和创建bean的阶段
 		refresh(context);
 	}
 
@@ -624,7 +631,14 @@ public class SpringApplication {
 		}
 	}
 
+	/**
+	 * 打印 Banner
+	 *
+	 * @param environment
+	 * @return
+	 */
 	private Banner printBanner(ConfigurableEnvironment environment) {
+		// banner模式，可以是console、log、off
 		if (this.bannerMode == Banner.Mode.OFF) {
 			return null;
 		}
@@ -1389,7 +1403,15 @@ public class SpringApplication {
 	 * @return the running {@link ApplicationContext}
 	 */
 	public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
-		// 构造 SpringApplication 对象（构造方法还有一些重要的操作，spi，推动main 方法，应用类型推断等等）
+		// 实例化 SpringApplication 对象（spring 应用）（构造方法还有一些重要的操作，spi（BootstrapRegistryInitializer、ApplicationContextInitializer、ApplicationListener），推断 main 方法，应用类型推断等等）
+		/*
+			1配置primarySources
+			2配置环境是否为web环境
+			3配置启动器初始器
+			4创建容器初始化器
+			5创建应用监听器
+			6配置应用主方法所在类（就是main方法所在类）
+		 */
 		return new SpringApplication(primarySources).run(args);
 	}
 

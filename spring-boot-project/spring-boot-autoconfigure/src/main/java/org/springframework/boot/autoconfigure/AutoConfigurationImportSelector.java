@@ -92,6 +92,12 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	private ConfigurationClassFilter configurationClassFilter;
 
+	/**
+	 * 返回需要导入的全限定类名数组
+	 *
+	 * @param annotationMetadata
+	 * @return
+	 */
 	@Override
 	public String[] selectImports(AnnotationMetadata annotationMetadata) {
 		// 配置参数 spring.boot.enableautoconfiguration 是否打开，默认 true 开启
@@ -196,7 +202,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @return a list of candidate configurations
 	 */
 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
-		// 获取需要被加载的FactoryClass，也就是key（spring.factories 中key）
+		// 获取需要被加载的FactoryClass，也就是key（spring.factories 中key），自动配置的key是 org.springframework.boot.autoconfigure.EnableAutoConfiguration
 		//【spring spi】
 		List<String> configurations = SpringFactoriesLoader.loadFactoryNames(getSpringFactoriesLoaderFactoryClass(),
 				getBeanClassLoader());

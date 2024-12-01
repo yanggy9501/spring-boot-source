@@ -53,7 +53,7 @@ import org.springframework.data.repository.Repository;
 @Documented
 @Inherited
 @SpringBootConfiguration
-@EnableAutoConfiguration
+@EnableAutoConfiguration // 开启 springboot 自动配置的注解功能，springboot的四大神器之一，其借助@import的帮助
 @ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
 		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
 // AutoConfigurationExcludeFilter的作用是扫描到的配置类名字如果在自动配置类名集合中，就不解析

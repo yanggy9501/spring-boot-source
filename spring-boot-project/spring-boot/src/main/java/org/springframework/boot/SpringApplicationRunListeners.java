@@ -37,6 +37,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Andy Wilkinson
  * @author Chris Bono
  */
+// 启动监听就是我们需要监听SpringBoot的启动流程，实现SpringApplicationRunListener类即可监听
 class SpringApplicationRunListeners {
 
 	private final Log log;

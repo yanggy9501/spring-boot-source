@@ -81,6 +81,15 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
 @Inherited
 @AutoConfigurationPackage
 @Import(AutoConfigurationImportSelector.class)
+/*
+	spring spi 配合@EnablAutoConfiguration使用的话，它主要是提供一种配置查找的功能，即根据@EnablAutoConfiguration的完整类名
+	org.springframework.boot.autoconfigure.EnableAutoConfiguration作为查找的Key，获取对应的一组@Configuration类。
+	所以，@EnableAutoConfiguration大致的自动配置过程为：
+
+	1.从classpath中搜寻所有的META-INF/spring.factories配置文件
+	2.获取所有key为org.springframework.boot.autoconfigure.EnableAutoConfiguration（也可能是EnableXxx）的value
+	3.通过反射来实例化对应标有@Configuration注解的JavaConfig形式的IoC容器配置类，然后统一汇总到IoC容器中
+*/
 public @interface EnableAutoConfiguration {
 
 	/**
@@ -90,12 +99,16 @@ public @interface EnableAutoConfiguration {
 	String ENABLED_OVERRIDE_PROPERTY = "spring.boot.enableautoconfiguration";
 
 	/**
+	 * 自动配置需要配置排除的 bean class
+	 *
 	 * Exclude specific auto-configuration classes such that they will never be applied.
 	 * @return the classes to exclude
 	 */
 	Class<?>[] exclude() default {};
 
 	/**
+	 * 自动配置需要配置排除的 bean class name
+	 *
 	 * Exclude specific auto-configuration class names such that they will never be
 	 * applied.
 	 * @return the class names to exclude
