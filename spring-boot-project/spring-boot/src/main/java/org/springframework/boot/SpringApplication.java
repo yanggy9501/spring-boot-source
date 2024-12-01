@@ -484,7 +484,7 @@ public class SpringApplication {
 			// 移除：Runtime.getRuntime().removeShutdownHook(this.shutdownHook)
 			shutdownHook.registerApplicationContext(context);
 		}
-		// ApplicationContext真正开始初始化容器和创建bean的阶段
+		// ApplicationContext真正开始初始化容器和创建bean的阶段，tomcat @see org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh
 		refresh(context);
 	}
 

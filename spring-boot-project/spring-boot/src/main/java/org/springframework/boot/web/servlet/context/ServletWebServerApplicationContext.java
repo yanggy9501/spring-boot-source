@@ -183,6 +183,8 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 
 			getBeanFactory().registerSingleton("webServerGracefulShutdown",
 					new WebServerGracefulShutdownLifecycle(this.webServer));
+
+			// 注册 WebServerStartStopLifecycle，通过周生命期类启动 webServer
 			getBeanFactory().registerSingleton("webServerStartStop",
 					new WebServerStartStopLifecycle(this, this.webServer));
 		}
